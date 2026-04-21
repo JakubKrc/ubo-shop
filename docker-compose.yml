@@ -1,0 +1,39 @@
+services:
+  shop-db:
+    image: mariadb:11
+    restart: always
+    env_file: .env
+    volumes:
+      - shop_db_data:/var/lib/mysql
+    networks:
+      - shop-network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  shop:
+    image: prestashop/prestashop:8
+    restart: always
+    env_file: .env
+    depends_on:
+      shop-db:
+        condition: service_healthy
+    expose:
+      - "80"
+    volumes:
+      - shop_files:/var/www/html
+    networks:
+      - shop-network
+      - apps_net
+
+volumes:
+  shop_db_data:
+  shop_files:
+
+networks:
+  shop-network:
+  apps_net:
+    external: true
+    name: apps_net
