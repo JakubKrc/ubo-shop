@@ -24,6 +24,7 @@ services:
       - "80"
     volumes:
       - shop_files:/var/www/html
+      - ./apache-proxy.conf:/etc/apache2/conf-enabled/zz-forwarded-proto.conf:ro
     networks:
       - shop-network
       - apps_net
